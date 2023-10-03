@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"os"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -11,9 +12,7 @@ var db *gorm.DB
 var err error
 
 func NewMySQLClient() {
-	conn := "todo:Password123!@(localhost:3306)/todoapp?charset=utf8&parseTime=True&loc=Local"
-
-	db, err = gorm.Open(mysql.Open(conn), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(os.Getenv("DB_CONNECTION_STRING")), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err)
