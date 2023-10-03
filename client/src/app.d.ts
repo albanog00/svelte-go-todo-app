@@ -6,8 +6,7 @@ declare global {
 		// interface Locals {}
 		// interface PageData {}
 		// interface Platform {}
-
 	}
 }
 
-export { };
+export {};

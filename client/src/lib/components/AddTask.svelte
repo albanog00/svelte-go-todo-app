@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tasks } from '$lib/store';
+	import { tasks } from '$lib';
 
 	let description: string;
 	let date: string;
@@ -14,7 +14,7 @@
 			date,
 			time
 		};
-		await tasks.add(newTask);
+		await tasks.create(newTask);
 
 		description = '';
 		date = '';

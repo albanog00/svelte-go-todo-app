@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { tasks } from '$lib/store';
+	import { tasks } from '$lib';
 	import type { Task } from '$lib/store/tasks';
 	import { CalendarDays, Clock, Edit, X } from 'lucide-svelte';
 
 	export let task: Task;
 
-	async function deleteTask() {
-		await tasks.remove(task.id);
-	}
+	const deleteTask = async () => await tasks.delete(task.id);
 </script>
 
 <div class="flex flex-row items-center justify-center gap-1">

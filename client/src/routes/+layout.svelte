@@ -1,3 +1,7 @@
+<script>
+	import '$lib/index.css';
+</script>
+
 <svelte:head>
 	<title>Todo App</title>
 </svelte:head>

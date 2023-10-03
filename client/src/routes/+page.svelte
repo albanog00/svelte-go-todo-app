@@ -1,10 +1,8 @@
 <script lang="ts">
-	import '../index.css';
-
 	import TaskItem from '$lib/components/TaskItem.svelte';
 	import AddTask from '$lib/components/AddTask.svelte';
 
-	import { tasks } from '$lib/store';
+	import { tasks } from '$lib';
 </script>
 
 <div class="flex flex-col justify-between gap-4 sm:flex-row sm:gap-0">

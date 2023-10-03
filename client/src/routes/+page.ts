@@ -1,7 +1,20 @@
-import { tasks } from "$lib/store";
+import { tasks } from '$lib';
+import type { Task } from '$lib/store/tasks';
+import type { PageLoad } from './$types';
 
-export const prerender = true;
+export const prerender = false;
 
-export async function load() {
-    tasks.fetchData();
-}
+export const load: PageLoad = async ({ fetch }) => {
+	async function fetchTasks(): Promise<Task[]> {
+		const data: Task[] = await fetch('http://127.0.0.1:3001/tasks', {
+			cache: 'no-cache'
+		})
+			.then(async (data) => await data.json())
+			.catch((error) => {
+				console.error(error);
+				return [];
+			});
+		return data;
+	}
+	tasks.set(await fetchTasks());
+};
