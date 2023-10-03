@@ -21,4 +21,6 @@ func NewMySQLClient() {
 	if err = db.AutoMigrate(&Task{}); err != nil {
 		log.Fatal(err)
 	}
+
+	db.AutoMigrate(&Task{}, &User{})
 }

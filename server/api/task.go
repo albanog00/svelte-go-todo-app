@@ -8,6 +8,12 @@ import (
 	"todoapp.com/server/internal/models"
 )
 
+type CreateTaskDTO struct {
+	Description string
+	Date        string
+	Time        string
+}
+
 func GetTasks(c *gin.Context) {
 	tasks, err := models.GetTasks()
 	if err != nil {
@@ -20,13 +26,22 @@ func GetTasks(c *gin.Context) {
 }
 
 func PostTask(c *gin.Context) {
-	var newTask models.Task
+	var newTask CreateTaskDTO
 	if err := c.BindJSON(&newTask); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"err": err,
+		})
 		return
 	}
 
-	newTask.Id = uuid.NewString()
-	task, err := models.CreateTask(&newTask)
+	task := &models.Task{
+		Id:          uuid.NewString(),
+		Description: newTask.Description,
+		Date:        newTask.Date,
+		Time:        newTask.Time,
+	}
+
+	task, err := models.CreateTask(task)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"err": err,

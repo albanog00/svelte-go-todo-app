@@ -2,13 +2,17 @@ package models
 
 import (
 	"errors"
+	"time"
 )
 
 type Task struct {
-	Id          string `json:"id" gorm:"primary_key"`
-	Description string `json:"description"`
-	Date        string `json:"date"`
-	Time        string `json:"time"`
+	Id          string    `json:"id" gorm:"primary_key"`
+	Description string    `json:"description"`
+	Date        string    `json:"date"`
+	Time        string    `json:"time"`
+	CreatedAt   time.Time `json:"createdAt" gorm:"default:current_timestamp(3)"`
+	UpdatedAt   time.Time `json:"updatedAt" gorm:"default:NULL"`
+	DeletedAt   time.Time `json:"deletedAt" gorm:"default:NULL"`
 }
 
 func GetTasks() ([]*Task, error) {
