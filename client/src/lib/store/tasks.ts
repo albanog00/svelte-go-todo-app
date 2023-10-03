@@ -19,7 +19,7 @@ export function createTasks() {
 			},
 			body: JSON.stringify(task)
 		};
-		const response: Task = await fetch('http://127.0.0.1:3001/tasks', options)
+		const response: Task = await fetch('http://localhost:3001/tasks', options)
 			.then(async (data) => await data.json())
 			.catch((error) => {
 				console.error(error);
@@ -36,7 +36,7 @@ export function createTasks() {
 				'Content-Type': 'application/json; charset=utf-8'
 			}
 		};
-		const response = await fetch(`http://127.0.0.1:3001/tasks/${id}`, options)
+		const response = await fetch(`http://localhost:3001/tasks/${id}`, options)
 			.then((data) => data)
 			.catch((error) => {
 				console.error(error);

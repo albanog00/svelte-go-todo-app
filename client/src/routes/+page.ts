@@ -6,7 +6,7 @@ export const prerender = false;
 
 export const load: PageLoad = async ({ fetch }) => {
 	async function fetchTasks(): Promise<Task[]> {
-		const data: Task[] = await fetch('http://127.0.0.1:3001/tasks', {
+		const data: Task[] = await fetch('http://localhost:3001/tasks', {
 			cache: 'no-cache'
 		})
 			.then(async (data) => await data.json())

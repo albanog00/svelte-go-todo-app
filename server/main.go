@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -14,10 +15,10 @@ import (
 func LoadEnv() {
 	var err error
 
-	if gin.Mode() == gin.ReleaseMode {
-		err = godotenv.Load("prod.env")
-	} else {
+	if gin.IsDebugging() {
 		err = godotenv.Load(".env")
+	} else {
+		err = godotenv.Load("prod.env")
 	}
 
 	if err != nil {
@@ -42,5 +43,12 @@ func main() {
 
 	r.POST("/users", api.PostUser)
 
-	r.Run("localhost:3001")
+	s := &http.Server{
+		Addr:    ":3001",
+		Handler: r,
+	}
+
+	if err := s.ListenAndServe(); err != nil {
+		log.Fatalf(err.Error())
+	}
 }
