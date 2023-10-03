@@ -12,7 +12,7 @@ type User struct {
 	Username  string    `json:"username" gorm:"unique"`
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"createdAt" gorm:"default:current_timestamp(3)"`
-	UpdatedAt time.Time `json:"updatedAt" gorm:"default:NULL"`
+	UpdatedAt time.Time `json:"updatedAt" gorm:"default:NULL ON UPDATE current_timestamp(3)"`
 	DeletedAt time.Time `json:"deletedAt" gorm:"default:NULL"`
 }
 
