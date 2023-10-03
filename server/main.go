@@ -40,5 +40,7 @@ func main() {
 	r.POST("/tasks", api.PostTask)
 	r.PUT("/tasks/:id", api.DeleteTask)
 
+	r.POST("/users", api.PostUser)
+
 	r.Run("localhost:3001")
 }

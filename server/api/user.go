@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"todoapp.com/server/internal/models"
 )
 
@@ -13,25 +14,26 @@ type CreateUserDTO struct {
 }
 
 func PostUser(c *gin.Context) {
-	var newUser CreateUserDTO
-	if err := c.BindJSON(&newUser); err != nil {
+	var user CreateUserDTO
+	if err := c.BindJSON(&user); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"err": err,
 		})
 		return
 	}
 
-	user := &models.User{
-		Username: newUser.Username,
-		Password: newUser.Password,
+	newUser := &models.User{
+		Id:       uuid.NewString(),
+		Username: user.Username,
+		Password: user.Password,
 	}
 
-	task, err := models.CreateUser(user)
+	_, err := models.CreateUser(newUser)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"err": err,
 		})
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, task)
+	c.IndentedJSON(http.StatusCreated, user)
 }

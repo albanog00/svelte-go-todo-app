@@ -8,8 +8,8 @@ import (
 )
 
 type User struct {
-	ID        string    `json:"id" gorm:"primary_key"`
-	Username  string    `json:"username"`
+	Id        string    `json:"id" gorm:"primary_key"`
+	Username  string    `json:"username" gorm:"unique"`
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"createdAt" gorm:"default:current_timestamp(3)"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"default:NULL"`
