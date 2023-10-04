@@ -17,7 +17,7 @@ func PostUser(c *gin.Context) {
 	var user CreateUserDTO
 	if err := c.BindJSON(&user); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"err": err,
+			"message": err,
 		})
 		return
 	}
@@ -31,7 +31,7 @@ func PostUser(c *gin.Context) {
 	_, err := models.CreateUser(newUser)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"err": err,
+			"message": err,
 		})
 		return
 	}

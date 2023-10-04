@@ -18,7 +18,7 @@ func GetTasks(c *gin.Context) {
 	tasks, err := models.GetTasks()
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"err": err,
+			"message": err,
 		})
 		return
 	}
@@ -29,7 +29,7 @@ func PostTask(c *gin.Context) {
 	var newTask CreateTaskDTO
 	if err := c.BindJSON(&newTask); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"err": err,
+			"message": err.Error(),
 		})
 		return
 	}
@@ -44,7 +44,7 @@ func PostTask(c *gin.Context) {
 	task, err := models.CreateTask(task)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"err": err,
+			"message": err.Error(),
 		})
 		return
 	}

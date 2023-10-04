@@ -43,6 +43,9 @@ func main() {
 
 	r.POST("/users", api.PostUser)
 
+	r.POST("/auth/signin", api.AuthUser)
+	r.GET("/auth/validate", api.ValidateAuthUser)
+
 	s := &http.Server{
 		Addr:    ":3001",
 		Handler: r,
