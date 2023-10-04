@@ -17,8 +17,9 @@ export function createTasks() {
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8'
 			},
-			body: JSON.stringify(task)
-		};
+			body: JSON.stringify(task),
+			credentials: "include"
+		} as RequestInit;
 		const response: Task = await fetch('http://localhost:3001/tasks', options)
 			.then(async (data) => await data.json())
 			.catch((error) => {
