@@ -1,12 +1,11 @@
 package api
 
 import (
-	"net/http"
+	"errors"
 	"os"
 	"strconv"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"todoapp.com/server/internal/models"
 )
@@ -41,59 +40,22 @@ func validateJWT(tokenString string) error {
 	return err
 }
 
-func ValidateAuthUser(c *gin.Context) {
-	token, err := c.Cookie("auth-jwt")
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
+func RetrieveClaimsFromToken(tokenString string) (jwt.Claims, error) {
+	if err := validateJWT(tokenString); err != nil {
+		return nil, err
 	}
 
-	if err := validateJWT(token); err != nil {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-
-	c.IndentedJSON(http.StatusAccepted, gin.H{
-		"message": "Authorized",
+	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
-}
-
-func AuthUser(c *gin.Context) {
-	var authUser AuthUserDto
-	if err := c.BindJSON(&authUser); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-
-	user := &models.User{
-		Username: authUser.Username,
-		Password: authUser.Password,
-	}
-
-	_, err := models.AuthUser(user)
 	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{
-			"message": err.Error(),
-		})
-		return
+		return nil, err
 	}
 
-	jwt, err := generateJWT(user)
-	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{
-			"message": err.Error(),
-		})
-		return
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return nil, errors.New("invalid token provided when retrieving claims")
 	}
 
-	c.SetCookie("auth-jwt", jwt, 60*60, "/", "localhost", false, true)
-	c.IndentedJSON(http.StatusOK, gin.H{
-		"success": true,
-	})
+	return claims, nil
 }

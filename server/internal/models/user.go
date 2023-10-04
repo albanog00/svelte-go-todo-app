@@ -21,7 +21,7 @@ func CreateUser(user *User) (*User, error) {
 	user.Password = string(hashed)
 	res := db.Create(user)
 	if res.RowsAffected == 0 {
-		return &User{}, errors.New("can't create task")
+		return &User{}, errors.New("can't create user")
 	}
 	return user, nil
 }

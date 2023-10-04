@@ -35,13 +35,17 @@ func init() {
 
 func main() {
 	r := gin.Default()
-	r.Use(cors.Default())
+	r.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowCredentials: true,
+	}))
 
 	r.GET("/tasks", api.GetTasks)
 	r.POST("/tasks", api.PostTask)
 	r.PUT("/tasks/:id", api.DeleteTask)
 
 	r.POST("/users", api.PostUser)
+	r.GET("/users", api.GetUserInfo)
 
 	r.POST("/auth/signin", api.AuthUser)
 	r.GET("/auth/validate", api.ValidateAuthUser)
