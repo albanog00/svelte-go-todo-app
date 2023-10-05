@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -36,19 +37,24 @@ func init() {
 func main() {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"OPTIONS", "GET", "POST", "PUT"},
+		AllowHeaders:     []string{"Content-Type"},
+		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
 	}))
+
+	r.GET("/users", api.GetUserInfo)
+	r.POST("/users", api.PostUser)
+
+	r.GET("/auth/validate", api.ValidateAuthUser)
+	r.POST("/auth/signin", api.AuthUser)
+	r.GET("/auth/signout", api.SignOutUser)
 
 	r.GET("/tasks", api.GetTasks)
 	r.POST("/tasks", api.PostTask)
 	r.PUT("/tasks/:id", api.DeleteTask)
-
-	r.POST("/users", api.PostUser)
-	r.GET("/users", api.GetUserInfo)
-
-	r.POST("/auth/signin", api.AuthUser)
-	r.GET("/auth/validate", api.ValidateAuthUser)
 
 	s := &http.Server{
 		Addr:    ":3001",

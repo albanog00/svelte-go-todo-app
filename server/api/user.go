@@ -61,7 +61,13 @@ func GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	username, _ := claims.GetSubject()
+	username, err := claims.GetSubject()
+	if err != nil {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"message": "Authorized",
@@ -128,6 +134,13 @@ func ValidateAuthUser(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"message": "Authorized",
+		"message": "authorized",
+	})
+}
+
+func SignOutUser(c *gin.Context) {
+	c.SetCookie("auth-jwt", "", -1, "/", "", false, true)
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"message": "success",
 	})
 }
