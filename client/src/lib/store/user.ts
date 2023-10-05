@@ -1,9 +1,10 @@
 import { writable } from "svelte/store";
 
-export interface User {
+interface SignedUser {
     username: string;
-    jwt: string;
 }
+
+export type User = SignedUser | undefined;
 
 export interface SignUser {
     username: string;
@@ -11,14 +12,15 @@ export interface SignUser {
 }
 
 export function createUser() {
-    const { subscribe, set } = writable<User>();
+    const { subscribe, set } = writable<User | undefined>();
 
     return {
         subscribe,
         set,
         signin: async (user: SignUser) => {
-            const signedUser: User = await fetch("http://localhost:3001/auth/signin", {
+            const signedUser: User = await fetch("/api/auth/signin", {
                 body: JSON.stringify(user),
+                cache: "no-cache",
                 method: "POST",
                 credentials: "include"
             })
@@ -28,7 +30,15 @@ export function createUser() {
             if (signedUser) {
                 set(signedUser)
             }
-            window.location.reload()
         },
+        signout: async () => {
+            const data = await fetch('/api/auth/signout', {
+                cache: "no-cache",
+                credentials: 'include'
+            })
+                .then((data) => data)
+                .catch((error) => console.log(error));
+            if (data && data.status === 200) set(undefined);
+        }
     }
 }

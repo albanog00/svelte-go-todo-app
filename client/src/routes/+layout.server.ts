@@ -1,4 +1,3 @@
-import { user } from '$lib';
 import type { User } from '$lib/store/user';
 import type { LayoutServerLoad } from './$types';
 
@@ -8,29 +7,27 @@ export const load: LayoutServerLoad = async ({ fetch, cookies }) => {
     const jwt = cookies.get("auth-jwt");
 
     async function fetchUserInfo(): Promise<User> {
-        const userInfo = await fetch('http://localhost:3001/users', {
+        const userInfo: User = await fetch('/api/users', {
             cache: "no-cache",
-            credentials: "include",
+            credentials: "same-origin",
         })
             .then(async (response) => (await response.json()).data)
             .catch((error) => {
                 console.error(error);
                 return undefined;
             });
-        return userInfo ? { ...userInfo, jwt } : undefined;
+        return userInfo;
     }
 
-    let userInfo: User | undefined;
+    let userInfo: User;
     if (jwt) {
         userInfo = await fetchUserInfo()
-        if (userInfo) {
-            user.set(userInfo)
-        } else {
+        if (!userInfo) {
             cookies.delete("auth-jwt")
         }
     }
 
     return {
-        user: userInfo,
+        user: userInfo
     }
 };

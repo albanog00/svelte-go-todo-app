@@ -12,15 +12,15 @@ export function createTasks() {
 
 	async function addTask(task: Task) {
 		if (!task) return;
-		const options = {
+		const response: Task = await fetch('/api/tasks', {
 			method: 'POST',
+			cache: "no-cache",
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8'
 			},
 			body: JSON.stringify(task),
-			credentials: "include"
-		} as RequestInit;
-		const response: Task = await fetch('http://localhost:3001/tasks', options)
+			credentials: "same-origin"
+		})
 			.then(async (data) => await data.json())
 			.catch((error) => {
 				console.error(error);
@@ -31,13 +31,14 @@ export function createTasks() {
 
 	async function deleteTask(id: string) {
 		if (!id) return;
-		const options = {
+		const response = await fetch(`/api/tasks/${id}`, {
 			method: 'PUT',
+			cache: "no-cache",
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8'
-			}
-		};
-		const response = await fetch(`http://localhost:3001/tasks/${id}`, options)
+			},
+			credentials: "same-origin"
+		})
 			.then((data) => data)
 			.catch((error) => {
 				console.error(error);

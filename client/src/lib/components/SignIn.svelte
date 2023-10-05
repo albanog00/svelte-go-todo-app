@@ -4,9 +4,7 @@
 	let username: string;
 	let password: string;
 
-	async function handleLogin() {
-		await user.signin({ username, password });
-	}
+	const handleLogin = async () => await user.signin({ username, password });
 </script>
 
 <div class="flex h-screen w-screen items-center justify-center p-4">
