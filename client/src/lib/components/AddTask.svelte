@@ -8,11 +8,11 @@
 	async function addTask() {
 		if (!description || !date || !time) return;
 
+		const dateTime = new Date(`${date} ${time}:00`);
 		let newTask = {
 			id: '',
 			description,
-			date,
-			time
+			date: dateTime
 		};
 		await tasks.create(newTask);
 

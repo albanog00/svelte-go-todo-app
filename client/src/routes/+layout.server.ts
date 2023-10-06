@@ -23,7 +23,9 @@ export const load: LayoutServerLoad = async ({ fetch, cookies }) => {
     if (jwt) {
         userInfo = await fetchUserInfo()
         if (!userInfo) {
-            cookies.delete("auth-jwt")
+            cookies.delete("auth-jwt", {
+                path: "/"
+            })
         }
     }
 

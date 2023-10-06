@@ -3,8 +3,7 @@ import { writable } from 'svelte/store';
 export interface Task {
 	id: string;
 	description: string;
-	date: string;
-	time: string;
+	date: Date;
 }
 
 export function createTasks() {
@@ -32,7 +31,7 @@ export function createTasks() {
 	async function deleteTask(id: string) {
 		if (!id) return;
 		const response = await fetch(`/api/tasks/${id}`, {
-			method: 'PUT',
+			method: 'DELETE',
 			cache: "no-cache",
 			headers: {
 				'Content-Type': 'application/json; charset=utf-8'
@@ -53,7 +52,7 @@ export function createTasks() {
 		create: async (task: Task) => {
 			const newTask = await addTask(task);
 			if (newTask) {
-				update((t) => [...t, newTask]);
+				update((t) => [...t, { ...newTask, date: new Date(newTask.date) }]);
 			}
 		},
 		delete: async (id: string) => {

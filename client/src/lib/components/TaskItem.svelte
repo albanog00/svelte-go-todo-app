@@ -16,11 +16,11 @@
 			<span>{task.description}</span>
 			<small class="flex flex-row justify-center gap-1">
 				<CalendarDays size={16} />
-				{task.date}
+				{task.date.toLocaleDateString('it-IT')}
 			</small>
 			<small class="flex flex-row justify-center gap-1">
 				<Clock size={16} />
-				{task.time}
+				{task.date.toLocaleTimeString('it-IT').slice(0, -3)}
 			</small>
 		</div>
 	</span>
