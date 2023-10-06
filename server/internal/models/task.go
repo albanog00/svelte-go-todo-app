@@ -14,13 +14,21 @@ type Task struct {
 	DeletedAt   time.Time `json:"deletedAt" gorm:"default:NULL"`
 }
 
-func GetTasks() ([]*Task, error) {
+const LIMIT int = 5
+
+func GetTasks(pageNum uint) ([]*Task, int64, error) {
 	var tasks []*Task
-	res := db.Find(&tasks)
+	var count int64 = 0
+	res := db.Find(&Task{}).Count(&count)
 	if res.Error != nil {
-		return nil, errors.New("no tasks found")
+		return nil, 0, errors.New("no tasks found")
 	}
-	return tasks, nil
+
+	res = db.Offset(LIMIT * int(pageNum)).Limit(LIMIT).Find(&tasks)
+	if res.Error != nil {
+		return nil, 0, errors.New("no tasks found")
+	}
+	return tasks, count, nil
 }
 
 func CreateTask(task *Task) (*Task, error) {

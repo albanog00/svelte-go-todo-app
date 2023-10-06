@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,14 +16,29 @@ type CreateTaskDTO struct {
 }
 
 func GetTasks(c *gin.Context) {
-	tasks, err := models.GetTasks()
+	var pageNum uint = 0
+	pageString := c.Query("page")
+
+	if pageString != "" {
+		if parsedString, err := strconv.ParseUint(pageString, 10, 32); err != nil {
+			pageNum = 0
+		} else {
+			pageNum = uint(parsedString)
+		}
+	}
+
+	tasks, count, err := models.GetTasks(pageNum)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"message": err,
+			"message": err.Error(),
 		})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, tasks)
+
+	c.IndentedJSON(http.StatusOK, gin.H{
+		"tasks": tasks,
+		"count": count,
+	})
 }
 
 func PostTask(c *gin.Context) {
