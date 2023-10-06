@@ -38,23 +38,23 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"},
-		AllowMethods:     []string{"OPTIONS", "GET", "POST", "PUT"},
+		AllowMethods:     []string{"OPTIONS", "GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
+		MaxAge:           15 * time.Minute,
 	}))
-
-	r.GET("/users", api.GetUserInfo)
-	r.POST("/users", api.PostUser)
 
 	r.GET("/auth/validate", api.ValidateAuthUser)
 	r.POST("/auth/signin", api.AuthUser)
 	r.GET("/auth/signout", api.SignOutUser)
 
+	r.GET("/users", api.GetUserInfo)
+	r.POST("/users", api.PostUser)
+
 	r.GET("/tasks", api.GetTasks)
 	r.POST("/tasks", api.PostTask)
-	r.PUT("/tasks/:id", api.DeleteTask)
+	r.DELETE("/tasks/:id", api.DeleteTask)
 
 	s := &http.Server{
 		Addr:    ":3001",

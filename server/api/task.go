@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -10,8 +11,7 @@ import (
 
 type CreateTaskDTO struct {
 	Description string
-	Date        string
-	Time        string
+	Date        time.Time
 }
 
 func GetTasks(c *gin.Context) {
@@ -38,7 +38,6 @@ func PostTask(c *gin.Context) {
 		Id:          uuid.NewString(),
 		Description: newTask.Description,
 		Date:        newTask.Date,
-		Time:        newTask.Time,
 	}
 
 	task, err := models.CreateTask(task)
