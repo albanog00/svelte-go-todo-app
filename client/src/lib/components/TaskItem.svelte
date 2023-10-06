@@ -4,11 +4,19 @@
 	import { CalendarDays, Clock, Edit, X } from 'lucide-svelte';
 
 	export let task: Task;
+	export let index: number;
+	export let handleDeleteTask: (cb: (page?: number) => Promise<void>) => Promise<void>;
 
-	const deleteTask = async () => await tasks.delete(task.id);
+	const handleDelete = async () =>
+		await handleDeleteTask(async function (page?: number) {
+			await tasks.delete(task.id, page);
+		});
 </script>
 
 <div class="flex flex-row items-center justify-center gap-1">
+	<span class="px-2">
+		{index}
+	</span>
 	<span
 		class="w-full max-w-full rounded-lg border border-gray-400 p-1 transition hover:bg-gray-200 hover:drop-shadow-lg"
 	>
@@ -25,7 +33,7 @@
 		</div>
 	</span>
 	<div class="flex flex-row gap-1">
-		<button on:click={deleteTask} class="text-red-500" type="submit">
+		<button on:click={handleDelete} class="text-red-500" type="submit">
 			<X />
 		</button>
 		<button type="submit">

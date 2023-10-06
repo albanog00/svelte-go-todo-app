@@ -1,5 +1,5 @@
-import { createTasks } from './store/tasks';
+import { createTask } from './store/tasks';
 import { createUser } from './store/user';
 
-export const tasks = createTasks();
+export const tasks = createTask();
 export const user = createUser();

@@ -1,9 +1,8 @@
 <script lang="ts">
 	import TaskItem from '$lib/components/TaskItem.svelte';
 	import AddTask from '$lib/components/AddTask.svelte';
+	import { getContext, onMount } from 'svelte';
 	import { tasks } from '$lib';
-	import type { Task } from '$lib/store/tasks';
-	import { onMount } from 'svelte';
 
 	const enum TaskListState {
 		Loading,
@@ -11,41 +10,95 @@
 		Error
 	}
 
-	async function fetchTasks(): Promise<Task[]> {
-		const data: Task[] = await fetch('/api/tasks', {
-			cache: 'no-cache',
-			credentials: 'same-origin'
-		})
-			.then(async (data) => await data.json())
-			.catch((error) => {
-				console.error(error);
-				return [];
-			});
-		return [...data.map((d) => ({ ...d, date: new Date(d.date) }))];
+	let selectedPage = 0;
+	let taskState = TaskListState.Loading;
+	let numberOfPages = 0;
+	let start = 0;
+
+	async function changePage(newPage: number) {
+		taskState = TaskListState.Loading;
+
+		selectedPage = newPage >= 0 ? newPage : selectedPage;
+		start = selectedPage * 5;
+		await tasks.fetch(selectedPage);
+		numberOfPages = Math.floor(($tasks.count - 1) / 5) + 1;
+
+		taskState = TaskListState.Loaded;
 	}
 
-	let taskState = TaskListState.Loading;
+	async function handleDeleteTask(cb: (page: number) => Promise<void>) {
+		taskState = TaskListState.Loading;
+
+		const tempNumberOfPages = Math.floor(($tasks.count - 1) / 5);
+		if (selectedPage === tempNumberOfPages && (selectedPage * ($tasks.count - 1)) % 5 === 0)
+			selectedPage -= 1;
+		await cb(selectedPage);
+		numberOfPages = Math.floor(($tasks.count - 1) / 5) + 1;
+		start = selectedPage * 5;
+
+		taskState = TaskListState.Loaded;
+	}
+
+	async function addTaskCallback(cb: (page: number) => Promise<void>) {
+		taskState = TaskListState.Loading;
+
+		await cb(selectedPage);
+		numberOfPages = Math.floor(($tasks.count - 1) / 5) + 1;
+
+		taskState = TaskListState.Loaded;
+	}
+
 	onMount(async () => {
-		const tasksInfo = await fetchTasks();
-		tasks.set(tasksInfo);
+		await tasks.fetch(selectedPage);
+		numberOfPages = Math.floor(($tasks.count - 1) / 5) + 1;
+		start = selectedPage * 5;
+
 		taskState = TaskListState.Loaded;
 	});
 </script>
 
 <div class="flex flex-col justify-between gap-4 sm:flex-row sm:gap-0">
-	<AddTask />
+	<AddTask {addTaskCallback} />
 	<div class="flex w-full flex-col items-center gap-2">
 		<h1 class="text-4xl font-bold">Your tasks</h1>
 		<div class="flex flex-col gap-1">
 			{#if taskState == TaskListState.Loading}
 				<span>Retrieving data...</span>
-			{:else if !$tasks}
+			{:else if !tasks}
 				<span>No task scheduled yet.</span>
 			{:else}
-				{#each $tasks as task}
-					<TaskItem {task} />
+				{#each $tasks.values as task, index}
+					<TaskItem {task} index={start + index + 1} {handleDeleteTask} />
 				{/each}
 			{/if}
+			<div class="grid grid-flow-col gap-1 text-sm">
+				<button
+					disabled={selectedPage < 0}
+					on:click={async () => await changePage(selectedPage - 1)}
+					class={`${
+						!numberOfPages && 'hidden'
+					} rounded-md border border-gray-400 px-3 py-1 transition hover:focus:bg-gray-400 enabled:hover:bg-gray-300 enabled:hover:drop-shadow-lg enabled:hover:focus:drop-shadow-lg disabled:opacity-60`}
+					>Prev</button
+				>
+				{#each Array(numberOfPages) as _, pageNumber}
+					<button
+						disabled={selectedPage === pageNumber}
+						on:click={async () => await changePage(pageNumber)}
+						class={`${
+							(pageNumber > selectedPage + 2 || pageNumber < selectedPage - 2) && 'hidden'
+						} rounded-md border border-gray-400 px-3 py-1 transition hover:focus:bg-gray-400 enabled:hover:bg-gray-300 enabled:hover:drop-shadow-lg enabled:hover:focus:drop-shadow-lg disabled:bg-gray-300`}
+						>{pageNumber + 1}</button
+					>
+				{/each}
+				<button
+					on:click={async () => await changePage(selectedPage + 1)}
+					disabled={selectedPage >= numberOfPages - 1}
+					class={`${
+						!numberOfPages && 'hidden'
+					} rounded-md border border-gray-400 px-3 py-1 transition hover:focus:bg-gray-400 enabled:hover:bg-gray-300 enabled:hover:drop-shadow-lg enabled:hover:focus:drop-shadow-lg disabled:opacity-60`}
+					>Next</button
+				>
+			</div>
 		</div>
 	</div>
 </div>
