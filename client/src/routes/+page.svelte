@@ -1,7 +1,7 @@
 <script lang="ts">
 	import TaskItem from '$lib/components/TaskItem.svelte';
 	import AddTask from '$lib/components/AddTask.svelte';
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { tasks } from '$lib';
 
 	const enum TaskListState {
@@ -62,18 +62,20 @@
 	<div class="flex w-full flex-col items-center gap-2">
 		<h1 class="text-4xl font-bold">Your tasks</h1>
 		<div class="flex flex-col gap-1">
-			{#if taskState == TaskListState.Loading}
-				<span>Retrieving data...</span>
-			{:else if !tasks}
-				<span>No task scheduled yet.</span>
-			{:else}
-				{#each $tasks.values as task, index}
-					<TaskItem {task} index={start + index + 1} {handleDeleteTask} />
-				{/each}
-			{/if}
+			<div class="flex h-96 flex-col gap-1">
+				{#if taskState == TaskListState.Loading}
+					<span>Retrieving data...</span>
+				{:else if !tasks}
+					<span>No task scheduled yet.</span>
+				{:else}
+					{#each $tasks.values as task, index}
+						<TaskItem {task} index={start + index + 1} {handleDeleteTask} />
+					{/each}
+				{/if}
+			</div>
 			<div class="grid grid-flow-col gap-1 text-sm">
 				<button
-					disabled={selectedPage < 0}
+					disabled={selectedPage <= 0}
 					on:click={async () => await changePage(selectedPage - 1)}
 					class={`${
 						!numberOfPages && 'hidden'
