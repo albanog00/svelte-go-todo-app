@@ -16,15 +16,16 @@ type Task struct {
 
 const LIMIT int = 5
 
-func GetTasks(pageNum uint) ([]*Task, int64, error) {
+func GetTasks(pageNum int64) ([]*Task, int64, error) {
 	var tasks []*Task
 	var count int64 = 0
-	res := db.Find(&Task{}).Count(&count)
-	if res.Error != nil {
-		return nil, 0, errors.New("no tasks found")
-	}
 
-	res = db.Offset(LIMIT * int(pageNum)).Limit(LIMIT).Find(&tasks)
+	res := db.Model(&Task{}).
+		Count(&count).
+		Offset(LIMIT * int(pageNum)).
+		Limit(LIMIT).
+		Find(&tasks)
+
 	if res.Error != nil {
 		return nil, 0, errors.New("no tasks found")
 	}

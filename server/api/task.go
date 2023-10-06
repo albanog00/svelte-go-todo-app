@@ -16,15 +16,9 @@ type CreateTaskDTO struct {
 }
 
 func GetTasks(c *gin.Context) {
-	var pageNum uint = 0
-	pageString := c.Query("page")
-
-	if pageString != "" {
-		if parsedString, err := strconv.ParseUint(pageString, 10, 32); err != nil {
-			pageNum = 0
-		} else {
-			pageNum = uint(parsedString)
-		}
+	pageNum, err := strconv.ParseInt(c.Query("page"), 10, 32)
+	if err != nil {
+		pageNum = 0
 	}
 
 	tasks, count, err := models.GetTasks(pageNum)
@@ -36,8 +30,9 @@ func GetTasks(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{
-		"tasks": tasks,
-		"count": count,
+		"message": "success",
+		"tasks":   tasks,
+		"count":   count,
 	})
 }
 
