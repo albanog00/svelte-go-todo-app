@@ -12,7 +12,7 @@ export interface SignUser {
 }
 
 export function createUser() {
-    const { subscribe, set } = writable<User | undefined>();
+    const { subscribe, set } = writable<User>();
 
     return {
         subscribe,
@@ -22,7 +22,7 @@ export function createUser() {
                 body: JSON.stringify(user),
                 cache: "no-cache",
                 method: "POST",
-                credentials: "include"
+                credentials: "same-origin"
             })
                 .then(async data => (await data.json()).data)
                 .catch(error => console.error(error))
@@ -30,15 +30,34 @@ export function createUser() {
             if (signedUser) {
                 set(signedUser)
             }
+            return signedUser;
+        },
+        signup: async (user: SignUser) => {
+            const signedUser: User = await fetch("/api/users", {
+                body: JSON.stringify(user),
+                cache: "no-cache",
+                method: "POST",
+                credentials: "same-origin"
+            })
+                .then(async data => (await data.json()).data)
+                .catch(error => console.error(error))
+
+            if (signedUser) {
+                set(signedUser)
+            }
+            return signedUser;
         },
         signout: async () => {
             const data = await fetch('/api/auth/signout', {
                 cache: "no-cache",
-                credentials: 'include'
+                credentials: 'same-origin'
             })
                 .then((data) => data)
                 .catch((error) => console.log(error));
-            if (data && data.status === 200) set(undefined);
+            if (data && data.status === 200) {
+                set(undefined);
+            }
+            location.replace("/sign-in")
         }
     }
 }

@@ -19,7 +19,7 @@ export type TasksStore = {
 async function fetchTasks(page: number = 0) {
 	const data: FetchTasksResponse = await fetch(`/api/tasks?page=${page}`, {
 		cache: 'no-cache',
-		credentials: 'same-origin'
+		credentials: 'same-origin',
 	})
 		.then(async (data) => await data.json())
 		.catch((error) => {

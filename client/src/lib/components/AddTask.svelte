@@ -1,27 +1,27 @@
 <script lang="ts">
 	import { tasks } from '$lib';
+	import type { TaskHandler } from '../../routes/+page.svelte';
 
-	export let addTaskCallback: (cb: (page?: number) => Promise<void>) => Promise<void>;
+	export let addTaskCallback: (cb: TaskHandler) => Promise<void>;
 
 	let description: string;
 	let date: string;
 	let time: string;
 
-	async function handleAdd() {
+	async function onAdd() {
 		if (!description || !date || !time) return;
-		addTaskCallback(async function (page?: number) {
-			const dateTime = new Date(`${date} ${time}:00`);
-			let newTask = {
-				id: '',
-				description,
-				date: dateTime
-			};
-			await tasks.add(newTask, page);
+		const dateTime = new Date(`${date} ${time}:00`);
+		let newTask = {
+			id: '',
+			description,
+			date: dateTime
+		};
 
-			description = '';
-			date = '';
-			time = '';
-		});
+		addTaskCallback(async (page?: number) => await tasks.add(newTask, page));
+
+		description = '';
+		date = '';
+		time = '';
 	}
 </script>
 
@@ -51,7 +51,7 @@
 		<button
 			type="submit"
 			disabled={!description || !date || !time}
-			on:click={handleAdd}
+			on:click={onAdd}
 			class="rounded-lg border border-gray-400 bg-gray-200 p-2 transition hover:focus:bg-gray-400 enabled:hover:bg-gray-300 enabled:hover:drop-shadow-lg enabled:hover:focus:drop-shadow-lg disabled:opacity-60"
 		>
 			Add task

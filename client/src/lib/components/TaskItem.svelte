@@ -2,15 +2,14 @@
 	import { tasks } from '$lib';
 	import type { Task } from '$lib/store/tasks';
 	import { CalendarDays, Clock, Edit, X } from 'lucide-svelte';
+	import type { TaskHandler } from '../../routes/+page.svelte';
 
 	export let task: Task;
 	export let index: number;
-	export let handleDeleteTask: (cb: (page?: number) => Promise<void>) => Promise<void>;
+	export let handleDeleteTask: (cb: TaskHandler) => Promise<void>;
 
-	const handleDelete = async () =>
-		await handleDeleteTask(async function (page?: number) {
-			await tasks.delete(task.id, page);
-		});
+	const onDelete = async () =>
+		await handleDeleteTask(async (page?: number) => await tasks.delete(task.id, page));
 </script>
 
 <div class="flex flex-row items-center justify-center gap-1">
@@ -33,7 +32,7 @@
 		</div>
 	</span>
 	<div class="flex flex-row gap-1">
-		<button on:click={handleDelete} class="text-red-500" type="submit">
+		<button on:click={onDelete} class="text-red-500" type="submit">
 			<X />
 		</button>
 		<button type="submit">
