@@ -13,15 +13,47 @@ import (
 type CreateTaskDTO struct {
 	Description string
 	Date        time.Time
+	Id          string
+}
+
+func GetUsernameFromToken(token string) (string, error) {
+	claims, err := RetrieveClaimsFromToken(token)
+	if err != nil {
+		return "", err
+
+	}
+
+	username, err := claims.GetSubject()
+	if err != nil {
+		return "", err
+	}
+
+	return username, nil
 }
 
 func GetTasks(c *gin.Context) {
+	token, err := c.Cookie("auth-jwt")
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
 	pageNum, err := strconv.ParseInt(c.Query("page"), 10, 32)
 	if err != nil {
 		pageNum = 0
 	}
 
-	tasks, count, err := models.GetTasks(pageNum)
+	username, err := GetUsernameFromToken(token)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	tasks, count, err := models.GetTasks(pageNum, username)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
@@ -38,7 +70,32 @@ func GetTasks(c *gin.Context) {
 
 func PostTask(c *gin.Context) {
 	var newTask CreateTaskDTO
+
+	token, err := c.Cookie("auth-jwt")
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
 	if err := c.BindJSON(&newTask); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	username, err := GetUsernameFromToken(token)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	user, err := models.GetUser(username)
+	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
@@ -49,9 +106,10 @@ func PostTask(c *gin.Context) {
 		Id:          uuid.NewString(),
 		Description: newTask.Description,
 		Date:        newTask.Date,
+		UserId:      user.Id,
 	}
 
-	task, err := models.CreateTask(task)
+	task, err = models.CreateTask(task)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),

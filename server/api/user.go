@@ -69,10 +69,18 @@ func GetUserInfo(c *gin.Context) {
 		return
 	}
 
+	user, err := models.GetUser(username)
+	if err != nil {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"message": "Authorized",
 		"data": gin.H{
-			"username": username,
+			"username": user.Username,
 		},
 	})
 }
