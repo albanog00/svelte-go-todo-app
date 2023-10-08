@@ -9,7 +9,6 @@ export const load: LayoutServerLoad = async ({ fetch, cookies, route }) => {
         const userInfo: User = await fetch('/api/users', {
             cache: "no-cache",
             credentials: "same-origin",
-            mode: "same-origin"
         })
             .then(async (response) => (await response.json()).data)
             .catch((error) => {
@@ -20,11 +19,16 @@ export const load: LayoutServerLoad = async ({ fetch, cookies, route }) => {
     }
 
     const user = cookies.get("auth-jwt") ? await fetchUserInfo() : undefined;
-    if (!user && (route.id !== "/sign-in" && route.id !== "/sign-up")) {
+    const notAuthRoute = (route.id !== "/sign-in" && route.id !== "/sign-up");
+    if (!user && notAuthRoute) {
         cookies.delete("auth-jwt", {
             path: "/"
         })
         throw redirect(307, `/sign-in`);
+    }
+
+    if (user && !notAuthRoute) {
+        throw redirect(301, '/');
     }
 
     return {
