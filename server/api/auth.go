@@ -28,26 +28,21 @@ func generateJWT(user *models.User) (string, error) {
 		"nbf":      time.Now().Unix(),
 		"username": user.Username,
 		"exp":      time.Now().Add(time.Duration(jwtExpiresIn) * time.Minute).Unix(),
+		"userId":   user.Id,
 	})
 
 	return token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 }
 
-func validateJWT(tokenString string) error {
-	_, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("SECRET_KEY")), nil
-	})
-	return err
-}
-
-func RetrieveClaimsFromToken(tokenString string) (jwt.Claims, error) {
-	if err := validateJWT(tokenString); err != nil {
-		return nil, err
-	}
-
+func validateJWT(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
+	return token, err
+}
+
+func RetrieveClaimsFromToken(tokenString string) (jwt.MapClaims, error) {
+	token, err := validateJWT(tokenString)
 	if err != nil {
 		return nil, err
 	}

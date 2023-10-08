@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -61,15 +62,9 @@ func GetUserInfo(c *gin.Context) {
 		return
 	}
 
-	username, err := claims.GetSubject()
-	if err != nil {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
+	userId := claims["userId"].(string)
 
-	user, err := models.GetUser(username)
+	user, err := models.GetUser(userId)
 	if err != nil {
 		c.IndentedJSON(http.StatusUnauthorized, gin.H{
 			"message": err.Error(),
@@ -99,14 +94,12 @@ func AuthUser(c *gin.Context) {
 		Password: authUser.Password,
 	}
 
-	_, err := models.AuthUser(user)
-	if err != nil {
+	if err := models.AuthUser(user); err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{
 			"message": err.Error(),
 		})
 		return
 	}
-
 	jwt, err := generateJWT(user)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{
@@ -114,6 +107,7 @@ func AuthUser(c *gin.Context) {
 		})
 		return
 	}
+	fmt.Println(jwt)
 
 	c.SetCookie("auth-jwt", jwt, 60*90, "/", "localhost", false, true)
 	c.IndentedJSON(http.StatusOK, gin.H{
@@ -133,7 +127,7 @@ func ValidateAuthUser(c *gin.Context) {
 		return
 	}
 
-	err = validateJWT(tokenString)
+	_, err = validateJWT(tokenString)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),

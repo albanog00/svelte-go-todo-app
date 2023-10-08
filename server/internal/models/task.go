@@ -18,18 +18,12 @@ type Task struct {
 
 const LIMIT int = 5
 
-func GetTasks(pageNum int64, username string) ([]*Task, int64, error) {
+func GetTasks(pageNum int64, userId string) ([]*Task, int64, error) {
 	var tasks []*Task
 	var count int64 = 0
-	var user User
 
-	res := db.Where("Username LIKE ?", username).First(&user)
-	if res.Error != nil {
-		return nil, 0, errors.New("no tasks found")
-	}
-
-	res = db.Model(&tasks).
-		Where("user_id LIKE ?", user.Id).
+	res := db.Model(&tasks).
+		Where("user_id LIKE ?", userId).
 		Count(&count).
 		Offset(LIMIT * int(pageNum)).
 		Limit(LIMIT).

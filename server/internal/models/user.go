@@ -28,18 +28,17 @@ func CreateUser(user *User) (*User, error) {
 	return user, nil
 }
 
-func AuthUser(checkUser *User) (*User, error) {
-	var user *User
-	res := db.First(&user, "username = ? ", checkUser.Username)
-	if res.Error != nil && bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(checkUser.Password)) != nil {
-		return nil, errors.New("user not found")
+func AuthUser(user *User) error {
+	res := db.First(&user, "username = ? ", user.Username)
+	if res.Error != nil && bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(user.Password)) != nil {
+		return errors.New("user not found")
 	}
-	return user, nil
+	return nil
 }
 
-func GetUser(username string) (*User, error) {
+func GetUser(userId string) (*User, error) {
 	var user *User
-	res := db.First(&user, "username = ?", username)
+	res := db.First(&user, "Id = ?", userId)
 	if res.Error != nil {
 		return nil, errors.New("user not found")
 	}

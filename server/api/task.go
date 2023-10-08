@@ -23,12 +23,12 @@ func GetUsernameFromToken(token string) (string, error) {
 
 	}
 
-	username, err := claims.GetSubject()
+	userId := claims["userId"].(string)
 	if err != nil {
 		return "", err
 	}
 
-	return username, nil
+	return userId, nil
 }
 
 func GetTasks(c *gin.Context) {
@@ -45,7 +45,7 @@ func GetTasks(c *gin.Context) {
 		pageNum = 0
 	}
 
-	username, err := GetUsernameFromToken(token)
+	userId, err := GetUsernameFromToken(token)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
@@ -53,7 +53,7 @@ func GetTasks(c *gin.Context) {
 		return
 	}
 
-	tasks, count, err := models.GetTasks(pageNum, username)
+	tasks, count, err := models.GetTasks(pageNum, userId)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
@@ -86,7 +86,7 @@ func PostTask(c *gin.Context) {
 		return
 	}
 
-	username, err := GetUsernameFromToken(token)
+	userId, err := GetUsernameFromToken(token)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
@@ -94,7 +94,7 @@ func PostTask(c *gin.Context) {
 		return
 	}
 
-	user, err := models.GetUser(username)
+	user, err := models.GetUser(userId)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
