@@ -79,13 +79,6 @@ func PostTask(c *gin.Context) {
 		return
 	}
 
-	if err := c.BindJSON(&newTask); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-
 	userId, err := GetUsernameFromToken(token)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
@@ -96,6 +89,13 @@ func PostTask(c *gin.Context) {
 
 	user, err := models.GetUser(userId)
 	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if err := c.BindJSON(&newTask); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})

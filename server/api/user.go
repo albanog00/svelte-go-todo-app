@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -107,9 +106,8 @@ func AuthUser(c *gin.Context) {
 		})
 		return
 	}
-	fmt.Println(jwt)
 
-	c.SetCookie("auth-jwt", jwt, 60*90, "/", "localhost", false, true)
+	c.SetCookie("auth-jwt", jwt, 60*90, "/", string(uuid.Nil.Domain()), false, true)
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"message": "success",
 		"data": gin.H{

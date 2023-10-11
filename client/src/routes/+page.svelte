@@ -31,25 +31,17 @@
 	}
 
 	async function handleDeleteTask(cb: TaskHandler) {
-		// taskState = TaskListState.Loading;
-
 		const tempNumberOfPages = Math.floor(($tasks.count - 1) / 5);
 		if (selectedPage === tempNumberOfPages && (selectedPage * ($tasks.count - 1)) % 5 === 0)
 			selectedPage -= 1;
 		await cb(selectedPage);
 		numberOfPages = Math.floor(($tasks.count - 1) / 5) + 1;
 		start = selectedPage * 5;
-
-		// taskState = TaskListState.Loaded;
 	}
 
 	async function addTaskCallback(cb: TaskHandler) {
-		// taskState = TaskListState.Loading;
-
 		await cb(selectedPage);
 		numberOfPages = Math.floor(($tasks.count - 1) / 5) + 1;
-
-		// taskState = TaskListState.Loaded;
 	}
 
 	onMount(async () => {

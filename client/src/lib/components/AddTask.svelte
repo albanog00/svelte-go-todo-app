@@ -36,7 +36,7 @@
 			placeholder="Write you task"
 			class="rounded-lg border border-gray-400 px-4 py-2 focus:drop-shadow-lg"
 		/>
-		<div class="flex w-full flex-row items-center justify-center gap-1">
+		<div class="flex w-full flex-col items-center justify-center gap-1 sm:flex-row">
 			<input
 				type="date"
 				bind:value={date}

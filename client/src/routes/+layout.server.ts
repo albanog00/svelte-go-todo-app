@@ -7,7 +7,7 @@ export const ssr = true;
 export const load: LayoutServerLoad = async ({ fetch, cookies, route }) => {
     async function fetchUserInfo(): Promise<User> {
         const userInfo: User = await fetch('/api/users', {
-            cache: "no-cache",
+            cache: "no-store",
             credentials: "same-origin",
         })
             .then(async (response) => (await response.json()).data)

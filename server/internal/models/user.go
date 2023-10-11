@@ -19,7 +19,7 @@ type User struct {
 }
 
 func CreateUser(user *User) (*User, error) {
-	hashed, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 8)
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	user.Password = string(hashed)
 	res := db.Create(user)
 	if res.RowsAffected == 0 {
@@ -29,8 +29,9 @@ func CreateUser(user *User) (*User, error) {
 }
 
 func AuthUser(user *User) error {
-	res := db.First(&user, "username = ? ", user.Username)
-	if res.Error != nil && bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(user.Password)) != nil {
+	var dbUser User
+	res := db.First(&dbUser, "username = ? ", user.Username)
+	if res.Error != nil && bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password)) != nil {
 		return errors.New("user not found")
 	}
 	return nil
