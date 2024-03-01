@@ -10,11 +10,6 @@ import (
 	"todoapp.com/server/internal/models"
 )
 
-type AuthUserDto struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 func generateJWT(user *models.User) (string, error) {
 	jwtExpiresIn, err := strconv.Atoi(os.Getenv("JWT_EXPIRES_IN"))
 	if err != nil {

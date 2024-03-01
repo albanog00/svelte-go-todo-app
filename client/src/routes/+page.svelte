@@ -12,7 +12,7 @@
 	import TaskItem from '$lib/components/TaskItem.svelte';
 	import AddTask from '$lib/components/AddTask.svelte';
 	import { onMount } from 'svelte';
-	import { tasks, user } from '$lib';
+	import { tasks } from '$lib';
 
 	let taskState = TaskListState.Loading;
 	let selectedPage = 0;

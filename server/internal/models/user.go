@@ -18,8 +18,13 @@ type User struct {
 	Task []Task `json:"tasks" gorm:"foreignKey:UserId"`
 }
 
+type AuthUserDto struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func CreateUser(user *User) (*User, error) {
-	hashed, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 8)
 	user.Password = string(hashed)
 	res := db.Create(user)
 	if res.RowsAffected == 0 {
@@ -28,13 +33,13 @@ func CreateUser(user *User) (*User, error) {
 	return user, nil
 }
 
-func AuthUser(user *User) error {
+func AuthUser(user AuthUserDto) (*User, error) {
 	var dbUser User
-	res := db.First(&dbUser, "username = ? ", user.Username)
+	res := db.Where("username = ?", user.Username).First(&dbUser)
 	if res.Error != nil && bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password)) != nil {
-		return errors.New("user not found")
+		return &User{}, errors.New("user not found")
 	}
-	return nil
+	return &dbUser, nil
 }
 
 func GetUser(userId string) (*User, error) {

@@ -28,16 +28,16 @@ func LoadEnv() {
 }
 
 func init() {
-	// gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.ReleaseMode)
 
 	LoadEnv()
 	models.NewMySQLClient()
 }
 
 func main() {
-	r := gin.New()
+	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowOrigins:     []string{"https://localhost:5173, http://localhost:5173"},
 		AllowMethods:     []string{"OPTIONS", "GET", "POST", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -61,7 +61,7 @@ func main() {
 		Handler: r,
 	}
 
-	if err := s.ListenAndServe(); err != nil {
+	if err := s.ListenAndServeTLS("app.localhost.com.crt", "app.localhost.com.key"); err != nil {
 		log.Fatalf(err.Error())
 	}
 }

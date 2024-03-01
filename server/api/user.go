@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -80,7 +81,7 @@ func GetUserInfo(c *gin.Context) {
 }
 
 func AuthUser(c *gin.Context) {
-	var authUser AuthUserDto
+	var authUser models.AuthUserDto
 	if err := c.BindJSON(&authUser); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
@@ -88,17 +89,14 @@ func AuthUser(c *gin.Context) {
 		return
 	}
 
-	user := &models.User{
-		Username: authUser.Username,
-		Password: authUser.Password,
-	}
-
-	if err := models.AuthUser(user); err != nil {
+	user, err := models.AuthUser(authUser)
+	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{
 			"message": err.Error(),
 		})
 		return
 	}
+
 	jwt, err := generateJWT(user)
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{
@@ -107,7 +105,7 @@ func AuthUser(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("auth-jwt", jwt, 60*90, "/", string(uuid.Nil.Domain()), false, true)
+	c.SetCookie("auth-jwt", jwt, int(time.Minute)*15, "/", "localhost", false, true)
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"message": "success",
 		"data": gin.H{
@@ -139,7 +137,7 @@ func ValidateAuthUser(c *gin.Context) {
 }
 
 func SignOutUser(c *gin.Context) {
-	c.SetCookie("auth-jwt", "", -1, "/", "", false, true)
+	c.SetCookie("auth-jwt", "", -1, "/", uuid.Nil.Domain().String(), false, true)
 	c.IndentedJSON(http.StatusOK, gin.H{
 		"message": "success",
 	})
